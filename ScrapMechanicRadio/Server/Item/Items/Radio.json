@@ -1,0 +1,95 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Radio.name",
+    "Description": ""
+  },
+  "Icon": "Icons/ItemsGenerated/Radio.png",
+  "Categories": [
+    "Blocks.Deco"
+  ],
+  "PlayerAnimationsId": "Block",
+  "Scale": 2,
+  "BlockType": {
+    "Material": "Empty",
+    "DrawType": "Model",
+    "BlockSoundSetId": "Metal",
+    "Opacity": "Solid",
+    "CustomModel": "Blocks/Radio.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Radio.png",
+        "Weight": 1
+      }
+    ],
+    "CustomModelScale": 1,
+    "Flags": {},
+    "RandomRotation": "None",
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "SoftBlocks"
+      }
+    },
+    "PlacementSettings": {
+      "AllowRotationKey": false,
+      "PlaceInEmptyBlocks": true
+    },
+    "BlockParticleSetId": "Metal",
+    "HitboxType": "Block_Seven_Eighth",
+    "MovementSettings": {},
+    "RequiresAlphaBlending": false,
+    "VariantRotation": "NESW",
+    "InteractionHint": "server.interactionHints.turnon",
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "ChangeState",
+            "Changes": {
+              "default": "Off",
+              "Off": "On",
+              "On": "Off"
+            }
+          }
+        ]
+      }
+    },
+    "State": {
+      "Definitions": {
+        "On": {
+          "InteractionHint": "server.interactionHints.turnoff",
+          "Light": null,
+          "Particles": null,
+          "AmbientSoundEventId": "Radio"
+        },
+        "Off": {
+          "InteractionHint": "server.interactionHints.turnon",
+          "Light": null,
+          "Particles": null,
+          "AmbientSoundEventId": null
+        }
+      }
+    },
+    "Looping": false,
+    "RotationYawPlacementOffset": "None",
+    "FlipType": "Symmetric",
+    "CubeShadingMode": "Reflective"
+  },
+  "Recipe": {
+    "TimeSeconds": 1,
+    "Input": [
+      {
+        "ItemId": "Ingredient_Bar_Copper",
+        "Quantity": 1
+      }
+    ],
+    "BenchRequirement": [
+      {
+        "Id": "Workbench",
+        "Type": "Crafting",
+        "Categories": [
+          "Workbench_Tinkering"
+        ]
+      }
+    ]
+  }
+}
