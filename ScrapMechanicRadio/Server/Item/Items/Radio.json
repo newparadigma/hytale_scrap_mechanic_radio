@@ -59,13 +59,15 @@
           "InteractionHint": "server.interactionHints.turnoff",
           "Light": null,
           "Particles": null,
-          "AmbientSoundEventId": "Radio"
+          "AmbientSoundEventId": "Radio",
+          "CustomModelAnimation": "Blocks/Animations/Radio_On.blockyanim"
         },
         "Off": {
           "InteractionHint": "server.interactionHints.turnon",
           "Light": null,
           "Particles": null,
-          "AmbientSoundEventId": null
+          "AmbientSoundEventId": null,
+          "CustomModelAnimation": "Blocks/Animations/Radio_Off.blockyanim"
         }
       }
     },

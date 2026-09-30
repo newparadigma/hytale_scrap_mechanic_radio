@@ -1,0 +1,31 @@
+{
+  "formatVersion": 1,
+  "duration": 60,
+  "holdLastKeyframe": false,
+  "nodeAnimations": {
+    "antenna_up": {
+      "position": [],
+      "orientation": [],
+      "shapeStretch": [],
+      "shapeVisible": [
+        {
+          "time": 0,
+          "delta": false
+        }
+      ],
+      "shapeUvOffset": []
+    },
+    "antenna_down": {
+      "position": [],
+      "orientation": [],
+      "shapeStretch": [],
+      "shapeVisible": [
+        {
+          "time": 0,
+          "delta": true
+        }
+      ],
+      "shapeUvOffset": []
+    }
+  }
+}
