@@ -1,0 +1,9 @@
+{
+  "Layers": [
+    {
+      "Files": ["Sounds/boombox.ogg"],
+      "Looping": true,
+      "Volume": 7
+    }
+  ]
+}
