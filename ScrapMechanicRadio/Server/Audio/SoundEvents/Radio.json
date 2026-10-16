@@ -1,7 +1,7 @@
 {
   "Layers": [
     {
-      "Files": ["Sounds/country.ogg", "Sounds/jazz.ogg", "Sounds/retro.ogg", "Sounds/rock.ogg", "Sounds/slow_jazz.ogg", "Sounds/techno.ogg"],
+      "Files": ["Sounds/Radio/country.ogg", "Sounds/Radio/jazz.ogg", "Sounds/Radio/retro.ogg", "Sounds/Radio/rock.ogg", "Sounds/Radio/slow_jazz.ogg", "Sounds/Radio/techno.ogg"],
       "Looping": true,
       "Volume": 7
     }
