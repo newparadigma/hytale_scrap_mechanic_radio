@@ -3,7 +3,7 @@
     {
       "Files": ["Sounds/Boombox/synth_tsunami.ogg", "Sounds/Boombox/highwave.ogg", "Sounds/Boombox/dekotora.ogg", "Sounds/Boombox/sticky_wheels.ogg", "Sounds/Boombox/electric_fever_dreams.ogg"],
       "Looping": true,
-      "Volume": 7
+      "Volume": 5
     }
   ]
 }
