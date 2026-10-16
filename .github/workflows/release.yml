@@ -3,50 +3,85 @@ name: Release
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: release
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      zip: ${{ steps.meta.outputs.zip }}
+      release: ${{ steps.check.outputs.release }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: extractions/setup-just@v3
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
 
       - name: Read version
         id: meta
         run: |
           version=$(just --evaluate version)
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          zip=$(just --evaluate zip_file)
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
-          echo "zip=$(just --evaluate zip_file)" >> "$GITHUB_OUTPUT"
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
 
       - name: Check tag
         id: check
         env:
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
-          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
-            echo "::warning::Tag $TAG already exists. Bump Version in ScrapMechanicRadio/manifest.json to make a release."
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          status=0
+          git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null || status=$?
+          case "$status" in
+            0)
+              if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+                echo "::error::Tag $TAG already exists. Bump Version in ScrapMechanicRadio/manifest.json."
+                exit 1
+              fi
+              echo "::warning::Tag $TAG already exists, skipping release."
+              echo "release=false" >> "$GITHUB_OUTPUT"
+              ;;
+            2)
+              echo "release=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::git ls-remote failed with exit code $status"
+              exit 1
+              ;;
+          esac
 
       - name: Build zip
-        if: steps.check.outputs.exists == 'false'
         run: just zip
 
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push' && steps.check.outputs.release == 'true'
+        with:
+          name: release-zip
+          path: ${{ steps.meta.outputs.zip }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && needs.build.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-zip
+
       - name: Create release
-        if: steps.check.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.meta.outputs.tag }}
-          ZIP: ${{ steps.meta.outputs.zip }}
-        run: gh release create "$TAG" "$ZIP" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+          TAG: ${{ needs.build.outputs.tag }}
+          ZIP: ${{ needs.build.outputs.zip }}
+        run: gh release create "$TAG" "$ZIP" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
