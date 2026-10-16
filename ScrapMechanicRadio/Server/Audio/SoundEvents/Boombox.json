@@ -1,9 +1,11 @@
 {
+  "StartAttenuationDistance": 8,
+  "MaxDistance": 25,
   "Layers": [
     {
       "Files": ["Sounds/Boombox/synth_tsunami.ogg", "Sounds/Boombox/highwave.ogg", "Sounds/Boombox/dekotora.ogg", "Sounds/Boombox/sticky_wheels.ogg", "Sounds/Boombox/electric_fever_dreams.ogg"],
       "Looping": true,
-      "Volume": 5
+      "Volume": 0
     }
   ]
 }

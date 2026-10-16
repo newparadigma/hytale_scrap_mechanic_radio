@@ -1,9 +1,11 @@
 {
+  "StartAttenuationDistance": 8,
+  "MaxDistance": 25,
   "Layers": [
     {
       "Files": ["Sounds/Radio/country.ogg", "Sounds/Radio/jazz.ogg", "Sounds/Radio/retro.ogg", "Sounds/Radio/rock.ogg", "Sounds/Radio/slow_jazz.ogg", "Sounds/Radio/techno.ogg"],
       "Looping": true,
-      "Volume": 5
+      "Volume": 0
     }
   ]
 }
