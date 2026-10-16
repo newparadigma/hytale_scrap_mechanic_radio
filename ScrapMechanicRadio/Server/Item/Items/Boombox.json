@@ -1,9 +1,9 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.BoomboxRadio.name",
+    "Name": "server.items.Boombox.name",
     "Description": ""
   },
-  "Icon": "Icons/ItemsGenerated/BoomboxRadio.png",
+  "Icon": "Icons/ItemsGenerated/Boombox.png",
   "Categories": [
     "Blocks.Deco"
   ],
@@ -14,10 +14,10 @@
     "DrawType": "Model",
     "BlockSoundSetId": "Metal",
     "Opacity": "Solid",
-    "CustomModel": "Blocks/BoomboxRadio.blockymodel",
+    "CustomModel": "Blocks/Boombox.blockymodel",
     "CustomModelTexture": [
       {
-        "Texture": "Blocks/BoomboxRadio.png",
+        "Texture": "Blocks/Boombox.png",
         "Weight": 1
       }
     ],
@@ -59,15 +59,15 @@
           "InteractionHint": "server.interactionHints.turnoff",
           "Light": null,
           "Particles": null,
-          "AmbientSoundEventId": "BoomboxRadio",
-          "CustomModelAnimation": "Blocks/Animations/BoomboxRadio_On.blockyanim"
+          "AmbientSoundEventId": "Boombox",
+          "CustomModelAnimation": "Blocks/Animations/Boombox_On.blockyanim"
         },
         "Off": {
           "InteractionHint": "server.interactionHints.turnon",
           "Light": null,
           "Particles": null,
           "AmbientSoundEventId": null,
-          "CustomModelAnimation": "Blocks/Animations/BoomboxRadio_Off.blockyanim"
+          "CustomModelAnimation": "Blocks/Animations/Boombox_Off.blockyanim"
         }
       }
     },
