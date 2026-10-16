@@ -1,16 +1,16 @@
 {
     "Group": "newparadigma",
     "Name": "Scrap Mechanic Radio",
-    "Version": "1.0.0",
+    "Version": "1.0.2",
     "Description": "Adds the Scrap Mechanic Radio to Hytale!",
     "Authors": [
         {
             "Name": "newparadigma",
             "Email": "foyer_lengthy8u@icloud.com",
-            "Url": ""
+            "Url": "https://github.com/newparadigma"
         }
     ],
-    "Website": "https://github.com/newparadigma/hytale_scrap_mechanic_radio ",
+    "Website": "https://github.com/newparadigma/ScrapMechanicRadio",
     "ServerVersion": "*",
     "Dependencies": {},
     "OptionalDependencies": {},
