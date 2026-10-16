@@ -5,16 +5,23 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to upload to CurseForge, e.g. v1.0.2
+        required: true
 
 permissions:
   contents: read
 
+# Only PR runs share a group: on push a newer pending run would cancel an older pending release
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
@@ -85,3 +92,61 @@ jobs:
           TAG: ${{ needs.build.outputs.tag }}
           ZIP: ${{ needs.build.outputs.zip }}
         run: gh release create "$TAG" "$ZIP" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+
+  curseforge:
+    needs: [build, release]
+    if: >-
+      !cancelled() && !failure() && vars.CURSEFORGE_PROJECT_ID != '' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && needs.build.outputs.release == 'true'))
+    runs-on: ubuntu-latest
+    environment: curseforge
+    steps:
+      - name: Upload to CurseForge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          # hytale.curseforge.com is the promo site; the Upload API answers on any other subdomain
+          CURSEFORGE_API_HOST: 1430699.curseforge.com
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_GAME_VERSION: Early Access
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.build.outputs.tag }}
+        run: |
+          if [ -z "$CURSEFORGE_TOKEN" ]; then
+            echo "::error::CURSEFORGE_TOKEN secret is not set (repository or curseforge environment)"
+            exit 1
+          fi
+          if [[ ! $CURSEFORGE_PROJECT_ID =~ ^[0-9]+$ ]]; then
+            echo "::error::CURSEFORGE_PROJECT_ID must be a numeric project ID, got: $CURSEFORGE_PROJECT_ID"
+            exit 1
+          fi
+          if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag must look like v1.2.3, got: $TAG"
+            exit 1
+          fi
+
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.zip' --dir asset
+          set -- asset/*.zip
+          if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+            echo "::error::Release $TAG must have exactly one .zip asset"
+            exit 1
+          fi
+          zip=$1
+
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body > changelog.md
+          jq -n \
+            --arg displayName "Scrap Mechanic Radio $TAG" \
+            --rawfile changelog changelog.md \
+            --arg gameVersion "$CURSEFORGE_GAME_VERSION" \
+            '{displayName: $displayName, changelog: $changelog, changelogType: "markdown",
+              releaseType: "release", isMarkedForManualRelease: true, gameVersionNames: [$gameVersion]}' > metadata.json
+
+          # No --retry: CurseForge doesn't dedupe, a retry after a timeout can create a second file
+          if ! curl --fail-with-body -sS --connect-timeout 30 --max-time 600 -X POST \
+            "https://$CURSEFORGE_API_HOST/api/projects/$CURSEFORGE_PROJECT_ID/upload-file" \
+            -H "X-Api-Token: $CURSEFORGE_TOKEN" \
+            -F "metadata=<metadata.json" \
+            -F "file=@$zip"; then
+            echo "::error::CurseForge upload failed. Before re-running, check the project's Files: the file may have been accepted anyway."
+            exit 1
+          fi
