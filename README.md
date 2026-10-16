@@ -25,8 +25,10 @@ On other systems or for a custom location set `HYTALE_MODS_DIR`.
 
 [release.yml](.github/workflows/release.yml) runs on pull requests to `main` and on every push to `main`:
 
-- on a pull request it builds the zip and fails if the `v<Version>` tag already exists, so bump `Version` in the PR
+- on a pull request it builds the zip and fails if the mod (`ScrapMechanicRadio/`) changed but the `v<Version>` tag already exists, so bump `Version` in the PR
 - on a push (e.g. a merged PR) it builds the zip and creates the `v<Version>` tag and a GitHub release with the zip attached; if the tag already exists, the release is skipped
+
+Bump `Version` only for changes to the mod itself. Changes to the build, CI or docs don't need a new version and don't make a release.
 
 ### CurseForge
 

@@ -44,16 +44,32 @@ jobs:
         id: check
         env:
           TAG: ${{ steps.meta.outputs.tag }}
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
           status=0
           git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null || status=$?
           case "$status" in
             0)
-              if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-                echo "::error::Tag $TAG already exists. Bump Version in ScrapMechanicRadio/manifest.json."
-                exit 1
-              fi
-              echo "::warning::Tag $TAG already exists, skipping release."
+              # Version unchanged is fine as long as the mod itself (ScrapMechanicRadio/) is unchanged
+              git fetch --quiet --no-tags --depth=1 origin "$BASE"
+              changed=0
+              git diff --quiet "$BASE" HEAD -- ScrapMechanicRadio/ || changed=$?
+              case "$changed" in
+                0)
+                  echo "::notice::Tag $TAG already exists and ScrapMechanicRadio/ is unchanged: no release needed."
+                  ;;
+                1)
+                  if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+                    echo "::error::ScrapMechanicRadio/ changed but tag $TAG already exists. Bump Version in ScrapMechanicRadio/manifest.json."
+                    exit 1
+                  fi
+                  echo "::warning::ScrapMechanicRadio/ changed but tag $TAG already exists, skipping release."
+                  ;;
+                *)
+                  echo "::error::git diff against $BASE failed with exit code $changed"
+                  exit 1
+                  ;;
+              esac
               echo "release=false" >> "$GITHUB_OUTPUT"
               ;;
             2)
